@@ -1,0 +1,27 @@
+{
+  "sprites": [
+    {
+      "name": "sprite_0",
+      "x": 0,
+      "y": 0,
+      "width": 240,
+      "height": 240
+    },
+    {
+      "name": "sprite_1",
+      "x": 240,
+      "y": 0,
+      "width": 100,
+      "height": 150
+    },
+    {
+      "name": "sprite_2",
+      "x": 340,
+      "y": 0,
+      "width": 200,
+      "height": 200
+    }
+  ],
+  "sheet_width": 4096,
+  "sheet_height": 240
+}
