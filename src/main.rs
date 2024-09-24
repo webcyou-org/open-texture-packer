@@ -1,8 +1,11 @@
-use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, Rgba};
+use image::{DynamicImage, GenericImageView, ImageBuffer};
 use serde::{Serialize, Deserialize};
-use std::path::Path;
+use std::fs;
 use std::fs::File;
-use std::io::Write;
+use std::io::{self, Write};
+use std::path::Path;
+use std::env;
+use image::GenericImage;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Sprite {
@@ -20,16 +23,48 @@ struct SpriteSheet {
     sheet_height: u32,
 }
 
+fn collect_image_paths(dir_path: &String) -> io::Result<Vec<String>> {
+    let mut image_paths = vec![];
+
+    for entry in fs::read_dir(dir_path)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if path.is_file() {
+            if let Some(ext) = path.extension() {
+                if ext == "png" || ext == "jpg" || ext == "jpeg" {
+                    image_paths.push(path.to_string_lossy().to_string());
+                }
+            }
+        }
+    }
+
+    Ok(image_paths)
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let image_paths = vec!["sprite1.png", "sprite2.png", "sprite3.png"];
+    let args: Vec<String> = env::args().collect();
+    if args.len() < 2 {
+        eprintln!("Usage: {} <directory>", args[0]);
+        std::process::exit(1);
+    }
+
+    let image_paths = collect_image_paths(&args[1])?;
+    if image_paths.is_empty() {
+        eprintln!("No image files found in the directory.");
+        std::process::exit(1);
+    }
+
+    // 読み込んだ画像を処理
     let mut images: Vec<DynamicImage> = vec![];
 
+    // 画像の読み込み
     for path in &image_paths {
         let img = image::open(path)?;
         images.push(img);
     }
 
-    // テクスチャシートの幅と高さを計算 (ここでは単純に縦に並べる)
+    // テクスチャシートの幅と高さを計算 (縦に並べる)
     let sheet_width = images.iter().map(|img| img.width()).max().unwrap_or(0);
     let sheet_height = images.iter().map(|img| img.height()).sum();
 
