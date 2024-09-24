@@ -1,0 +1,18 @@
+.DS_Store
+
+## Editor
+*.swp
+*.swo
+.idea
+*.iml
+.vscode
+.project
+.vs/
+
+## Tool
+.valgrindrc
+.cargo
+*.pdb
+
+debug/
+target/
