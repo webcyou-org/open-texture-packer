@@ -1,5 +1,15 @@
 use image::{DynamicImage, GenericImageView};
 use std::path::Path;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct JsonSprite {
+    pub name: String,
+    pub x: u32,
+    pub y: u32,
+    pub width: u32,
+    pub height: u32,
+}
 
 #[derive(Debug, Clone)]
 pub struct Sprite {
@@ -38,5 +48,15 @@ impl Sprite {
         self.x = x;
         self.y = y;
         self.image_index = image_index;
+    }
+
+    pub fn to_json(&self) -> JsonSprite {
+        JsonSprite {
+            name: self.name.clone(),
+            x: self.x,
+            y: self.y,
+            width: self.width,
+            height: self.height,
+        }
     }
 }

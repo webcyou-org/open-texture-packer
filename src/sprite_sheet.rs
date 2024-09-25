@@ -1,10 +1,32 @@
-use crate::sprite::Sprite;
+use serde::{Deserialize, Serialize};
+use crate::sprite::{Sprite, JsonSprite};
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct JsonSpriteSheet {
+    pub sprites: Vec<JsonSprite>,
+    pub sheet_width: u32,
+    pub sheet_height: u32,
+}
 
 #[derive(Debug, Clone)]
 pub struct SpriteSheet {
     pub sprites: Vec<Sprite>,
     pub total_width: u32,
     pub total_height: u32,
+}
+
+impl SpriteSheet {
+    pub fn to_json(&self) -> JsonSpriteSheet {
+        let mut sprites = Vec::new();
+        for (_i, sprite) in self.sprites.iter().enumerate() {
+            sprites.push(sprite.to_json())
+        }
+        JsonSpriteSheet {
+            sprites,
+            sheet_width: self.total_width,
+            sheet_height: self.total_height,
+        }
+    }
 }
 
 pub fn calculate_sheet_dimensions(

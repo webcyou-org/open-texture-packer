@@ -3,40 +3,9 @@ use std::io;
 use std::path::Path;
 use std::fs::File;
 use image::{GenericImage, RgbaImage};
-use serde::{Deserialize, Serialize};
 use serde_json::to_writer_pretty;
 use crate::constant::ImageExtension;
-use crate::sprite::Sprite;
 use crate::sprite_sheet::SpriteSheet;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct JsonSprite {
-    pub name: String,
-    pub x: u32,
-    pub y: u32,
-    pub width: u32,
-    pub height: u32,
-}
-
-impl JsonSprite {
-    pub fn new(sprite: &Sprite) -> Self {
-        JsonSprite {
-            name: sprite.name.clone(),
-            x: sprite.x,
-            y: sprite.y,
-            width: sprite.width,
-            height: sprite.height,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct JsonSpriteSheet {
-    pub sprites: Vec<JsonSprite>,
-    pub sheet_width: u32,
-    pub sheet_height: u32,
-}
-
 
 pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
     let mut image_paths = vec![];
@@ -71,20 +40,9 @@ pub fn save_texture_sheet(texture_sheet: &RgbaImage, output_dir: &Path, sheet_co
 }
 
 pub fn save_texture_sheet_json(sprite_sheet: &SpriteSheet, output_dir: &Path, sheet_count: usize) -> io::Result<()> {
-    let mut sprites = Vec::new();
-    for (_i, sprite) in sprite_sheet.sprites.iter().enumerate() {
-        sprites.push(JsonSprite::new(sprite))
-    }
-
-    let texture_sheet = JsonSpriteSheet {
-        sprites,
-        sheet_width: sprite_sheet.total_width,
-        sheet_height: sprite_sheet.total_height,
-    };
-
     let json_file = output_dir.join(format!("texture_sheet_{}.json", sheet_count));
     let file = File::create(json_file)?;
-    to_writer_pretty(file, &texture_sheet).expect("Failed to write JSON");
+    to_writer_pretty(file, &sprite_sheet.to_json()).expect("Failed to write JSON");
 
     println!("Saved texture sheet JSON {}", sheet_count);
     Ok(())
