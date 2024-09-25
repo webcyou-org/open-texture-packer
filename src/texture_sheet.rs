@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use image::{DynamicImage, GenericImageView};
+use image::DynamicImage;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Sprite {
