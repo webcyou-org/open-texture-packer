@@ -1,15 +1,15 @@
-mod texture_sheet;
 mod file_io;
-mod sprite_packer;
 mod constant;
+mod sprite;
+mod sprite_sheet;
 
 use std::fs;
 use std::path::Path;
-use file_io::collect_image_paths;
-use sprite_packer::generate_texture_sheets;
-use texture_sheet::calculate_sheet_dimensions;
+use file_io::{collect_image_paths, generate_texture_sheets};
 use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT, DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR};
 use clap::Parser;
+use sprite::Sprite;
+use sprite_sheet::calculate_sheet_dimensions;
 
 #[derive(Parser)]
 struct Cli {
@@ -39,11 +39,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::process::exit(1);
     }
 
-    let images: Vec<_> = image_paths.iter().map(|path| image::open(path).unwrap()).collect();
+    let mut sprites: Vec<_> = image_paths.iter().map(|path| {
+        Sprite::new(path.to_string()).unwrap()
+    }).collect();
 
-    let layouts = calculate_sheet_dimensions(&images, args.width, args.height);
+    let layouts = calculate_sheet_dimensions(&mut sprites, args.width, args.height);
     for (i, layout) in layouts.iter().enumerate() {
-        generate_texture_sheets(&images, &layout, output_dir, i + 1)?;
+        generate_texture_sheets(layout, output_dir, i + 1)?;
     }
 
     Ok(())
