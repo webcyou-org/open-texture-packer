@@ -2,6 +2,9 @@
 
 Open source and free Texture Packer tool written in rust.
 
+![twitter_header_photo_1](https://github.com/user-attachments/assets/75316555-b0e6-4465-b2f2-ac4943b25f39)
+
+
 ## Basic Usage
 
 Specifies the path of the directory containing the images to be textured.
