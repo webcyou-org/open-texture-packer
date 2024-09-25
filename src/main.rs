@@ -17,6 +17,10 @@ struct Cli {
     input_dir: String,
     #[clap(default_value_t = String::from(DEFAULT_OUTPUT_DIR))]
     output_dir: String,
+    #[clap(short, long, default_value_t = MAX_SHEET_WIDTH)]
+    width: u32,
+    #[clap(short = 't', long, default_value_t = MAX_SHEET_HEIGHT)]
+    height: u32,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -37,7 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let images: Vec<_> = image_paths.iter().map(|path| image::open(path).unwrap()).collect();
 
-    let layouts = calculate_sheet_dimensions(&images, MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT);
+    let layouts = calculate_sheet_dimensions(&images, args.width, args.height);
     for (i, layout) in layouts.iter().enumerate() {
         generate_texture_sheets(&images, &layout, output_dir, i + 1)?;
     }
