@@ -8,6 +8,8 @@ use std::path::Path;
 use std::env;
 use file_io::collect_image_paths;
 use sprite_packer::generate_texture_sheets;
+use texture_sheet::calculate_sheet_dimensions;
+use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
@@ -35,7 +37,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let images: Vec<_> = image_paths.iter().map(|path| image::open(path).unwrap()).collect();
-    generate_texture_sheets(&images, output_dir)?;
+    let layout = calculate_sheet_dimensions(&images, MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT);
+    generate_texture_sheets(&images, &layout, output_dir)?;
 
     Ok(())
 }
