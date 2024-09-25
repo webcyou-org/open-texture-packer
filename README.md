@@ -32,3 +32,8 @@ cargo run
 * <https://github.com/webcyou-org>
 * <https://github.com/panicdragon>
 * <https://www.webcyou.com/>
+
+### License
+
+Copyright (c) 2024 Daisuke Takayama
+Released under the [MIT license](http://opensource.org/licenses/mit-license.php)
