@@ -9,13 +9,13 @@ use std::env;
 use file_io::collect_image_paths;
 use sprite_packer::generate_texture_sheets;
 use texture_sheet::calculate_sheet_dimensions;
-use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT};
+use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT, DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
 
     let input_dir = if args.len() < 2 {
-        String::from("./")
+        String::from(DEFAULT_INPUT_DIR)
     } else {
         args[1].clone()
     };
@@ -23,7 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let output_dir = if args.len() >= 3 {
         Path::new(&args[2])
     } else {
-        Path::new("./output")
+        Path::new(DEFAULT_OUTPUT_DIR)
     };
 
     if !output_dir.exists() {
