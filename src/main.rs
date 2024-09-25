@@ -13,12 +13,12 @@ use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        eprintln!("Usage: {} <input_directory> [output_directory]", args[0]);
-        std::process::exit(1);
-    }
 
-    let input_dir = &args[1];
+    let input_dir = if args.len() < 2 {
+        String::from("./")
+    } else {
+        args[1].clone()
+    };
 
     let output_dir = if args.len() >= 3 {
         Path::new(&args[2])

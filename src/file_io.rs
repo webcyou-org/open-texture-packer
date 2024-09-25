@@ -6,7 +6,7 @@ use image::RgbaImage;
 use serde_json::to_writer_pretty;
 use crate::texture_sheet::{Sprite, SpriteSheet};
 
-pub fn collect_image_paths(dir_path: &String) -> io::Result<Vec<String>> {
+pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
     let mut image_paths = vec![];
 
     for entry in fs::read_dir(dir_path)? {
