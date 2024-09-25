@@ -9,7 +9,6 @@ pub struct Sprite {
     pub width: u32,
     pub height: u32,
     pub image: DynamicImage,
-    pub path: String,
     pub image_index: u32,
 }
 
@@ -31,7 +30,6 @@ impl Sprite {
             width,
             height,
             image,
-            path,
             image_index: 0
         })
     }

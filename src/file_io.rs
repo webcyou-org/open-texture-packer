@@ -90,17 +90,6 @@ pub fn save_texture_sheet_json(sprite_sheet: &SpriteSheet, output_dir: &Path, sh
     Ok(())
 }
 
-pub fn save_texture_sheet_and_json(
-    texture_sheet: &RgbaImage,
-    sprite_sheet: &SpriteSheet,
-    output_dir: &Path,
-    sheet_count: usize,
-) -> io::Result<()> {
-    save_texture_sheet(texture_sheet, output_dir, sheet_count)?;
-    save_texture_sheet_json(sprite_sheet, output_dir, sheet_count)?;
-    Ok(())
-}
-
 pub fn generate_texture_sheets(sprite_sheet: &SpriteSheet, output_dir: &Path, sheet_count: usize) -> io::Result<()> {
     let mut texture_sheet = RgbaImage::new(sprite_sheet.total_width, sprite_sheet.total_height);
 
@@ -111,12 +100,7 @@ pub fn generate_texture_sheets(sprite_sheet: &SpriteSheet, output_dir: &Path, sh
             .expect("Failed to copy image");
     }
 
-    save_texture_sheet_and_json(
-        &texture_sheet,
-        sprite_sheet,
-        output_dir,
-        sheet_count,
-    )?;
-
+    save_texture_sheet(&texture_sheet, output_dir, sheet_count)?;
+    save_texture_sheet_json(sprite_sheet, output_dir, sheet_count)?;
     Ok(())
 }
