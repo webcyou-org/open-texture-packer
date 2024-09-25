@@ -5,6 +5,7 @@ use std::fs::File;
 use image::RgbaImage;
 use serde_json::to_writer_pretty;
 use crate::texture_sheet::{Sprite, SpriteSheet};
+use crate::constant::ImageExtension;
 
 pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
     let mut image_paths = vec![];
@@ -15,7 +16,8 @@ pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
 
         if path.is_file() {
             if let Some(ext) = path.extension() {
-                if ext == "png" || ext == "jpg" || ext == "jpeg" {
+                if let Some(image_ext) = ImageExtension::from_extension(ext.to_str().unwrap_or("")) {
+                    println!("Found image with extension: {:?}", image_ext);
                     image_paths.push(path.to_string_lossy().to_string());
                 }
             }
