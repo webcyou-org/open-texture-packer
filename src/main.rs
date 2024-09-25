@@ -37,8 +37,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let images: Vec<_> = image_paths.iter().map(|path| image::open(path).unwrap()).collect();
-    let layout = calculate_sheet_dimensions(&images, MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT);
-    generate_texture_sheets(&images, &layout, output_dir)?;
+
+    let layouts = calculate_sheet_dimensions(&images, MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT);
+    for (i, layout) in layouts.iter().enumerate() {
+        generate_texture_sheets(&images, &layout, output_dir, i + 1)?;
+    }
 
     Ok(())
 }
