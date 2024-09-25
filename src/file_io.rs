@@ -51,3 +51,16 @@ pub fn save_texture_sheet_json(sprites: &[Sprite], output_dir: &Path, sheet_coun
     println!("Saved texture sheet JSON {}", sheet_count);
     Ok(())
 }
+
+pub fn save_texture_sheet_and_json(
+    texture_sheet: &RgbaImage,
+    sprite_infos: &[Sprite],
+    output_dir: &Path,
+    sheet_count: usize,
+    sheet_width: u32,
+    sheet_height: u32,
+) -> io::Result<()> {
+    save_texture_sheet(texture_sheet, output_dir, sheet_count)?;
+    save_texture_sheet_json(sprite_infos, output_dir, sheet_count, sheet_width, sheet_height)?;
+    Ok(())
+}
