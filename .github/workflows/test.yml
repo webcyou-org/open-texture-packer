@@ -23,9 +23,12 @@ jobs:
       - name: Build project
         run: cargo build --release --target ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
 
-      - name: Directory Check
-        run: cd target/release/deps && ls -l
+      - name: Directory Check1
+        run: cd target && ls -l
 
       - name: Directory Check2
+        run: cd target/release/deps && ls -l
+
+      - name: Directory Check3
         run: cd target/release/build && ls -l
 
