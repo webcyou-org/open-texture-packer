@@ -8,8 +8,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        artifact: [otp-linux, otp-windows.exe, otp-macos]
+        os: [ubuntu-latest, macos-latest]
+        artifact: [otp-linux, otp-macos]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,6 +23,6 @@ jobs:
       - name: Build project
         run: cargo build --release --target ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
 
-      - name: Rename binary
-        run: ls -l
+      - name: Directory Check
+        run: cd target/release/ && ls -l
 
