@@ -12,7 +12,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         artifact: [otp-linux, otp-windows.exe, otp-macos]
-        target: [x86_64-unknown-linux-gnu, x86_64-pc-windows-msvc, x86_64-apple-darwin]
 
     steps:
       - uses: actions/checkout@v2
@@ -21,11 +20,10 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.target }}
-          override: true
+          target: ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
 
       - name: Build project
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
 
       - name: Rename binary
         run: mv target/${{ matrix.target }}/release/otp ${{ matrix.artifact }}
