@@ -26,7 +26,7 @@ jobs:
         run: cargo build --release --target ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
 
       - name: Rename binary
-        run: mv target/${{ matrix.target }}/release/otp ${{ matrix.artifact }}
+        run: mv target/release/otp ${{ matrix.artifact }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
