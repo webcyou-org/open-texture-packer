@@ -33,11 +33,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         fs::create_dir_all(output_dir)?;
     }
 
-    let image_paths = collect_image_paths(input_dir.to_string())?;
+    let mut image_paths = collect_image_paths(input_dir.to_string())?;
     if image_paths.is_empty() {
         eprintln!("No image files found in the directory.");
         std::process::exit(1);
     }
+    image_paths.sort();
 
     let mut sprites: Vec<_> = image_paths.iter().map(|path| {
         Sprite::new(path.to_string()).unwrap()
