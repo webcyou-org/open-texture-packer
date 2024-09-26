@@ -31,7 +31,7 @@ jobs:
         run: mv target/${{ matrix.target }}/release/otp ${{ matrix.artifact }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.artifact }}
