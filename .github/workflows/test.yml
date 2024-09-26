@@ -9,26 +9,33 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        target: [x86_64-unknown-linux-gnu, x86_64-apple-darwin]
         artifact: [otp-linux, otp-macos]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
+          target: ${{ matrix.target }}
 
       - name: Build project
-        run: cargo build --release --target ${{ matrix.os == 'macos-latest' && 'x86_64-apple-darwin' || 'x86_64-unknown-linux-gnu' }}
+        run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Directory Check1
-        run: cd target && ls -l
+      - name: Rename binary
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            mv target/x86_64-apple-darwin/release/otp otp-macos
+          else
+            mv target/x86_64-unknown-linux-gnu/release/otp otp-linux
+          fi
 
-      - name: Directory Check2
-        run: cd target/release/deps && ls -l
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.os == 'macos-latest' && 'otp-macos' || 'otp-linux' }}
 
-      - name: Directory Check3
-        run: cd target/release/build && ls -l
 
