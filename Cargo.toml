@@ -1,7 +1,11 @@
 [package]
-name = "open_tpacker"
+name = "open_texture_packer"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "otp"
+path = "src/main.rs"
 
 [dependencies]
 image = "0.25"

@@ -8,18 +8,18 @@
       "height": 240
     },
     {
-      "name": "sprite3.png",
-      "x": 240,
-      "y": 0,
-      "width": 100,
-      "height": 150
-    },
-    {
       "name": "sprite2.png",
-      "x": 340,
+      "x": 240,
       "y": 0,
       "width": 200,
       "height": 200
+    },
+    {
+      "name": "sprite3.png",
+      "x": 440,
+      "y": 0,
+      "width": 100,
+      "height": 150
     }
   ],
   "sheet_width": 540,
