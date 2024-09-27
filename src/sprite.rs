@@ -19,7 +19,7 @@ pub struct Sprite {
     pub width: u32,
     pub height: u32,
     pub image: DynamicImage,
-    pub image_index: u32,
+    pub texture_index: u32,
 }
 
 impl Sprite {
@@ -40,14 +40,14 @@ impl Sprite {
             width,
             height,
             image,
-            image_index: 0
+            texture_index: 0
         })
     }
 
-    pub fn update(&mut self, x: u32, y: u32, image_index: u32) {
+    pub fn update(&mut self, x: u32, y: u32, texture_index: u32) {
         self.x = x;
         self.y = y;
-        self.image_index = image_index;
+        self.texture_index = texture_index;
     }
 
     pub fn to_json(&self) -> JsonSprite {

@@ -27,6 +27,10 @@ impl SpriteSheet {
             sheet_height: self.total_height,
         }
     }
+
+    pub fn total_frames(&self) -> usize {
+        self.sprites.len()
+    }
 }
 
 pub fn calculate_sheet_dimensions(
