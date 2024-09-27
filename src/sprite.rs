@@ -63,13 +63,20 @@ impl Sprite {
         }
     }
 
-    pub fn get_frame_percentage(&self, total_frames: u32) {
+    pub fn get_frame_percentage(&self, total_frames: u32) -> f64 {
         if self.index == 0 {
             0.0
         } else if self.index == total_frames - 1 {
             100.0
         } else {
             self.index as f64 * 100.0 / (total_frames - 1) as f64
-        };
+        }
+    }
+
+    pub fn get_css_animation_frame_property(&self, total_frames: u32) -> String {
+        format!(
+            "{:.3}% {{ background-position: -{}px -{}px; }}\n",
+            self.get_frame_percentage(total_frames), self.x, self.y
+        )
     }
 }

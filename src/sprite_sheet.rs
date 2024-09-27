@@ -31,6 +31,29 @@ impl SpriteSheet {
     pub fn total_frames(&self) -> usize {
         self.sprites.len()
     }
+
+    pub fn generate_css(&self, url: &str, fps: u32) -> String {
+        let first_sprites = &self.sprites[0];
+        let animation_duration = self.total_frames() as f64 / fps as f64;
+        let animation = format!("animation: spriteAnimation {:.2}s steps(1) infinite;", animation_duration);
+
+        format!(
+            ".pic {{\n    width: {}px;\n    height: {}px;\n    background-image: url('{}');\n   background-size: {}px auto;\n    {}\n}}\n",
+            first_sprites.width, first_sprites.height, url, self.total_width, animation
+        )
+    }
+
+    pub fn generate_animation_css(&self) -> String {
+        let mut css_animation = String::new();
+        css_animation.push_str("@keyframes spriteAnimation {\n");
+
+        for sprite in &self.sprites {
+            css_animation.push_str(&sprite.get_css_animation_frame_property(self.total_frames() as u32));
+        }
+
+        css_animation.push_str("}\n");
+        css_animation
+    }
 }
 
 pub fn calculate_sheet_dimensions(
