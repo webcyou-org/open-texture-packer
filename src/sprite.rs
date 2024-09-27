@@ -13,6 +13,7 @@ pub struct JsonSprite {
 
 #[derive(Debug, Clone)]
 pub struct Sprite {
+    pub index: u32,
     pub name: String,
     pub x: u32,
     pub y: u32,
@@ -34,6 +35,7 @@ impl Sprite {
             .to_string();
 
         Ok(Sprite {
+            index: 0,
             name,
             x: 0,
             y: 0,
@@ -44,7 +46,8 @@ impl Sprite {
         })
     }
 
-    pub fn update(&mut self, x: u32, y: u32, texture_index: u32) {
+    pub fn update(&mut self, x: u32, y: u32, index: u32, texture_index: u32) {
+        self.index = index;
         self.x = x;
         self.y = y;
         self.texture_index = texture_index;
@@ -58,5 +61,15 @@ impl Sprite {
             width: self.width,
             height: self.height,
         }
+    }
+
+    pub fn get_frame_percentage(&self, total_frames: u32) {
+        if self.index == 0 {
+            0.0
+        } else if self.index == total_frames - 1 {
+            100.0
+        } else {
+            self.index as f64 * 100.0 / (total_frames - 1) as f64
+        };
     }
 }

@@ -40,6 +40,7 @@ pub fn calculate_sheet_dimensions(
 ) -> Vec<SpriteSheet> {
     let mut sheets = Vec::new();
     let mut current_sprites = Vec::new();
+    let mut sprite_index = 0;
     let mut x_offset = 0;
     let mut y_offset = 0;
     let mut row_height = 0;
@@ -71,15 +72,16 @@ pub fn calculate_sheet_dimensions(
             row_height = 0;
             current_max_width = 0;
             sheet_count += 1;
+            sprite_index = 0;
         }
 
-        sprite.update(x_offset, y_offset, sheet_count);
-
+        sprite.update(x_offset, y_offset, sprite_index, sheet_count);
         current_sprites.push(sprite.clone());
 
         x_offset += img_width;
         row_height = row_height.max(img_height);
         current_max_width = current_max_width.max(x_offset);
+        sprite_index += 1;
     }
 
     total_height += row_height;
