@@ -75,7 +75,7 @@ impl Sprite {
 
     pub fn get_css_animation_frame_property(&self, total_frames: u32) -> String {
         format!(
-            "{:.3}% {{ background-position: -{}px -{}px; }}\n",
+            "    {:.3}% {{ background-position: -{}px -{}px; }}\n",
             self.get_frame_percentage(total_frames), self.x, self.y
         )
     }

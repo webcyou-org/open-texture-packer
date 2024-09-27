@@ -1,0 +1,14 @@
+@keyframes spriteAnimation {
+    0.000% { background-position: -0px -0px; }
+    50.000% { background-position: -240px -0px; }
+    100.000% { background-position: -440px -0px; }
+}
+
+.pic {
+    width: 240px;
+    height: 240px;
+    background-image: url('examples/output/texture_sheet_1.png');
+    background-size: 540px auto;
+    animation: spriteAnimation 0.05s steps(1) infinite;
+}
+

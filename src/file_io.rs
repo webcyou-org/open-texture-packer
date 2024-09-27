@@ -2,6 +2,7 @@ use std::fs;
 use std::io;
 use std::path::Path;
 use std::fs::File;
+use std::io::Write;
 use image::{GenericImage, RgbaImage};
 use serde_json::to_writer_pretty;
 use crate::constant::ImageExtension;
@@ -48,6 +49,17 @@ pub fn save_texture_sheet_json(sprite_sheet: &SpriteSheet, output_dir: &Path, sh
     Ok(())
 }
 
+pub fn save_css_animation_file(sprite_sheet: &SpriteSheet, output_dir: &Path, sheet_count: usize) -> io::Result<()> {
+    let output_file = output_dir.join(format!("texture_sheet_{}.png", sheet_count));
+    let css_file = output_dir.join(format!("texture_sheet_{}.css", sheet_count));
+    let mut file = File::create(css_file)?;
+    let css_content = sprite_sheet.to_css_animation(output_file);
+
+    writeln!(file, "{}", css_content)?;
+    println!("Saved texture sheet CSS {}", sheet_count);
+    Ok(())
+}
+
 pub fn generate_texture_sheets(sprite_sheet: &SpriteSheet, output_dir: &Path, sheet_count: usize) -> io::Result<()> {
     let mut texture_sheet = RgbaImage::new(sprite_sheet.total_width, sprite_sheet.total_height);
 
@@ -60,5 +72,7 @@ pub fn generate_texture_sheets(sprite_sheet: &SpriteSheet, output_dir: &Path, sh
 
     save_texture_sheet(&texture_sheet, output_dir, sheet_count)?;
     save_texture_sheet_json(sprite_sheet, output_dir, sheet_count)?;
+    save_css_animation_file(sprite_sheet, output_dir, sheet_count)?;
+
     Ok(())
 }

@@ -1,5 +1,7 @@
+use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use crate::sprite::{Sprite, JsonSprite};
+use crate::constant::DEFAULT_FPS;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JsonSpriteSheet {
@@ -13,9 +15,19 @@ pub struct SpriteSheet {
     pub sprites: Vec<Sprite>,
     pub total_width: u32,
     pub total_height: u32,
+    pub fps: u32,
 }
 
 impl SpriteSheet {
+    pub fn new(sprites: Vec<Sprite>, total_width: u32, total_height: u32,) -> Self {
+        SpriteSheet {
+            sprites,
+            total_width,
+            total_height,
+            fps: DEFAULT_FPS,
+        }
+    }
+
     pub fn to_json(&self) -> JsonSpriteSheet {
         let mut sprites = Vec::new();
         for (_i, sprite) in self.sprites.iter().enumerate() {
@@ -28,17 +40,29 @@ impl SpriteSheet {
         }
     }
 
+    pub fn change_fps(&mut self, fps: u32) {
+        self.fps = fps;
+    }
+
     pub fn total_frames(&self) -> usize {
         self.sprites.len()
     }
 
-    pub fn generate_css(&self, url: &str, fps: u32) -> String {
+    pub fn to_css_animation(&self, image_path: PathBuf) -> String {
+        let mut css = self.generate_animation_css();
+        css.push_str("\n");
+
+        css.push_str(&self.generate_css(&image_path.to_str().unwrap()));
+        css
+    }
+
+    pub fn generate_css(&self, url: &str) -> String {
         let first_sprites = &self.sprites[0];
-        let animation_duration = self.total_frames() as f64 / fps as f64;
+        let animation_duration = self.total_frames() as f64 / self.fps as f64;
         let animation = format!("animation: spriteAnimation {:.2}s steps(1) infinite;", animation_duration);
 
         format!(
-            ".pic {{\n    width: {}px;\n    height: {}px;\n    background-image: url('{}');\n   background-size: {}px auto;\n    {}\n}}\n",
+            ".pic {{\n    width: {}px;\n    height: {}px;\n    background-image: url('{}');\n    background-size: {}px auto;\n    {}\n}}\n",
             first_sprites.width, first_sprites.height, url, self.total_width, animation
         )
     }
@@ -83,11 +107,11 @@ pub fn calculate_sheet_dimensions(
         }
 
         if y_offset + img_height > max_sheet_height {
-            sheets.push(SpriteSheet {
-                sprites: current_sprites.clone(),
-                total_width: current_max_width,
-                total_height: total_height + row_height,
-            });
+            sheets.push(SpriteSheet::new(
+                current_sprites.clone(),
+                current_max_width,
+                total_height + row_height,
+            ));
             current_sprites.clear();
             x_offset = 0;
             y_offset = 0;
@@ -108,11 +132,11 @@ pub fn calculate_sheet_dimensions(
     }
 
     total_height += row_height;
-    sheets.push(SpriteSheet {
-        sprites: current_sprites,
-        total_width: current_max_width,
-        total_height: total_height,
-    });
+    sheets.push(SpriteSheet::new(
+        current_sprites,
+        current_max_width,
+        total_height,
+    ));
 
     sheets
 }
