@@ -1,6 +1,6 @@
 [package]
 name = "open_texture_packer"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 authors = ["Daisuke Takayama <info@webcyou.com>"]
 description = "Open source and free Texture Packer tool written in rust."
@@ -8,6 +8,10 @@ license = "MIT"
 repository = "https://github.com/webcyou-org/open-texture-packer"
 homepage = "https://github.com/webcyou-org/open-texture-packer"
 readme = "README.md"
+
+[lib]
+name = "open_texture_packer"
+path = "src/lib.rs"
 
 [[bin]]
 name = "otp"
