@@ -25,6 +25,17 @@ The otp command is available upon installation.
 otp <any option>
 ```
 
+### Rust
+
+```
+cargo add open_texture_packer
+```
+
+```
+[dependencies]
+open_texture_packer = "0.2.1"
+```
+
 ## Basic Usage
 
 Specifies the path of the directory containing the images to be textured.
