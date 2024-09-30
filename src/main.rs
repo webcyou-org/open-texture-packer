@@ -39,7 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut image_paths = collect_image_paths(input_dir.to_string())?;
     if image_paths.is_empty() {
         eprintln!("No image files found in the directory.");
-        std::process::exit(1);
+        return Ok(())
     }
     image_paths.sort();
 

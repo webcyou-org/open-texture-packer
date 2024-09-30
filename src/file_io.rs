@@ -23,12 +23,6 @@ pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
             }
         }
     }
-
-    if image_paths.is_empty() {
-        eprintln!("No image files found in the directory.");
-        std::process::exit(1);
-    }
-
     Ok(image_paths)
 }
 
