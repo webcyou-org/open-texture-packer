@@ -17,8 +17,7 @@ pub fn collect_image_paths(dir_path: String) -> io::Result<Vec<String>> {
 
         if path.is_file() {
             if let Some(ext) = path.extension() {
-                if let Some(image_ext) = ImageExtension::from_extension(ext.to_str().unwrap_or("")) {
-                    println!("Found image with extension: {:?}", image_ext);
+                if ImageExtension::from_extension(ext.to_str().unwrap_or("")).is_some() {
                     image_paths.push(path.to_string_lossy().to_string());
                 }
             }
