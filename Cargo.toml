@@ -1,6 +1,6 @@
 [package]
 name = "open_texture_packer"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 authors = ["Daisuke Takayama <info@webcyou.com>"]
 description = "Open source and free Texture Packer tool written in rust."
