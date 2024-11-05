@@ -64,6 +64,20 @@ cargo run <input_directory> [output_directory]
 cargo run
 ```
 
+### Result - Basic Usage
+
+When performed when three sprites (sprite1.png, sprite2.png, sprite3.png) of different sizes are present in a directory
+
+The following files are generated in the output
+
+```
+texture_sheet_1.css
+texture_sheet_1.json
+texture_sheet_1.png
+```
+
+The texture_sheet_1.png is merged to produce a texture image as follows
+
 ### Packing Algorithm
 
 Currently, the process is similar to Shelf Packing and Next Fit. 
