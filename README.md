@@ -68,6 +68,8 @@ cargo run
 
 When performed when three sprites (sprite1.png, sprite2.png, sprite3.png) of different sizes are present in a directory
 
+<img width="500" src="https://github.com/webcyou-org/open-texture-packer/blob/main/assets/screenshot/sprite_images.png">
+
 The following files are generated in the output
 
 ```
@@ -77,6 +79,9 @@ texture_sheet_1.png
 ```
 
 The texture_sheet_1.png is merged to produce a texture image as follows
+
+<img width="500" src="https://github.com/webcyou-org/open-texture-packer/blob/main/assets/screenshot/texture_image.png">
+
 
 ### Packing Algorithm
 
