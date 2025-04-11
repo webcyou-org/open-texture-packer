@@ -1,6 +1,6 @@
 [package]
 name = "open_texture_packer"
-version = "0.2.4"
+version = "0.2.5"
 edition = "2021"
 authors = ["Daisuke Takayama <info@webcyou.com>"]
 description = "Open source and free Texture Packer tool written in rust."
@@ -22,3 +22,4 @@ image = "^0.25"
 serde = { version = "^1.0", features = ["derive"] }
 serde_json = "^1.0"
 clap = { version = "^4.5", features = ["derive"] }
+log = "^0.4.27"

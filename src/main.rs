@@ -10,6 +10,7 @@ use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT, DEFAULT_INPUT_DIR, DEFAULT_OUT
 use clap::Parser;
 use sprite::Sprite;
 use sprite_sheet::calculate_sheet_dimensions;
+use log::error;
 
 #[derive(Parser)]
 struct Cli {
@@ -38,7 +39,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut image_paths = collect_image_paths(input_dir.to_string())?;
     if image_paths.is_empty() {
-        eprintln!("No image files found in the directory.");
+        error!("No image files found in the directory.");
         return Ok(())
     }
     image_paths.sort();
