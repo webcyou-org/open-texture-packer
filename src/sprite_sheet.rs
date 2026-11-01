@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use crate::sprite::{Sprite, JsonSprite};
 use crate::constant::DEFAULT_FPS;
+use crate::packing::{pack_rects, PackingAlgorithm, PackingError};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct JsonSpriteSheet {
@@ -80,6 +81,46 @@ impl SpriteSheet {
     }
 }
 
+/// Packs sprites with the given algorithm and returns the resulting sheets.
+///
+/// On each sheet, sprites stay in input order, so CSS animation frames play in
+/// the original sequence whichever algorithm is used.
+pub fn pack_sprites(
+    sprites: Vec<Sprite>,
+    algorithm: PackingAlgorithm,
+    max_sheet_width: u32,
+    max_sheet_height: u32,
+) -> Result<Vec<SpriteSheet>, PackingError> {
+    let sizes: Vec<(u32, u32)> = sprites.iter().map(|s| (s.width, s.height)).collect();
+    let result = pack_rects(&sizes, algorithm, max_sheet_width, max_sheet_height)?;
+
+    let mut sprites: Vec<Option<Sprite>> = sprites.into_iter().map(Some).collect();
+    let sheets = result
+        .sheets
+        .iter()
+        .enumerate()
+        .map(|(sheet_index, sheet)| {
+            let placed = sheet
+                .placements
+                .iter()
+                .enumerate()
+                .map(|(frame, placement)| {
+                    let mut sprite = sprites[placement.index]
+                        .take()
+                        .expect("each sprite is placed exactly once");
+                    sprite.update(placement.x, placement.y, frame as u32, sheet_index as u32);
+                    sprite
+                })
+                .collect();
+            SpriteSheet::new(placed, sheet.width, sheet.height)
+        })
+        .collect();
+
+    Ok(sheets)
+}
+
+/// The original packer, kept for existing callers. It does not report sprites
+/// larger than the maximum sheet size; prefer [`pack_sprites`].
 pub fn calculate_sheet_dimensions(
     sprites: &mut [Sprite],
     max_sheet_width: u32,

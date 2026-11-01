@@ -85,20 +85,52 @@ The texture_sheet_1.png is merged to produce a texture image as follows
 
 ### Packing Algorithm
 
-Currently, the process is similar to Shelf Packing and Next Fit. 
+Select an algorithm with `--algorithm` (`-a`). The default is `next-fit`.
 
-We plan to add them in the near future and make them selectable.
+```
+otp <input_directory> [output_directory] --algorithm skyline
+```
 
-- Shelf Packing
-- Next Fit
-- Best Fit
-- First Fit
+| `--algorithm` | Sprite order | Placement |
+|---|---|---|
+| `next-fit` | Input | Current shelf only. A single pass at the full sheet width |
+| `shelf-packing` | Height, descending | Current shelf only |
+| `first-fit` | Input | First shelf with room |
+| `first-fit-decreasing` | Height, descending | First shelf with room |
+| `best-fit` | Input | Shelf with the closest height, then the tightest gap |
+| `skyline` | Height, descending | Lowest top edge on the skyline (Bottom-Left) |
+| `maximal-rectangles` | Area, descending | Free rectangle with the smallest short-side gap (Best Short Side Fit) |
+
+All algorithms except `next-fit` also try narrower sheet widths and keep the layout with the fewest sheets and the smallest area.
+
+On each sheet, sprites stay in input order in the JSON and CSS output, so animation frames play in the original sequence.
+
+The following algorithms are planned:
+
 - Worst Fit
-- First Fit Decreasing
 - Best Fit Decreasing
 - Guillotine Cutting
-- Skyline Algorithm
-- Maximal Rectangles
+
+### Library
+
+`pack_rects` works on plain sizes, without loading images. `compare_algorithms` runs every algorithm on the same input.
+
+```rust
+use open_texture_packer::{compare_algorithms, pack_rects, PackingAlgorithm};
+
+let sizes = [(64, 64), (32, 128), (96, 48)];
+
+let result = pack_rects(&sizes, PackingAlgorithm::Skyline, 4096, 4096)?;
+for placement in &result.sheets[0].placements {
+    println!("#{} at ({}, {})", placement.index, placement.x, placement.y);
+}
+
+for result in compare_algorithms(&sizes, 4096, 4096)? {
+    println!("{}: {:.1}%", result.algorithm, result.occupancy() * 100.0);
+}
+```
+
+`pack_sprites` does the same for loaded `Sprite` values and returns `SpriteSheet` values ready to be written.
 
 ## Author
 

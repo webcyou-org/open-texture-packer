@@ -1,15 +1,10 @@
-mod file_io;
-mod constant;
-mod sprite;
-mod sprite_sheet;
-
 use std::fs;
 use std::path::Path;
-use file_io::{collect_image_paths, generate_texture_sheets};
-use constant::{MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT, DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR, DEFAULT_FPS};
+use open_texture_packer::{
+    collect_image_paths, generate_texture_sheets, pack_sprites, PackingAlgorithm, Sprite,
+    MAX_SHEET_WIDTH, MAX_SHEET_HEIGHT, DEFAULT_INPUT_DIR, DEFAULT_OUTPUT_DIR, DEFAULT_FPS,
+};
 use clap::Parser;
-use sprite::Sprite;
-use sprite_sheet::calculate_sheet_dimensions;
 use log::error;
 
 #[derive(Parser)]
@@ -24,6 +19,8 @@ struct Cli {
     height: u32,
     #[clap(short, long, default_value_t = DEFAULT_FPS)]
     fps: u32,
+    #[clap(short, long, value_enum, default_value_t = PackingAlgorithm::NextFit)]
+    algorithm: PackingAlgorithm,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -44,11 +41,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     image_paths.sort();
 
-    let mut sprites: Vec<_> = image_paths.iter().map(|path| {
+    let sprites: Vec<_> = image_paths.iter().map(|path| {
         Sprite::new(path.to_string()).unwrap()
     }).collect();
 
-    let mut sprite_sheets = calculate_sheet_dimensions(&mut sprites, args.width, args.height);
+    let mut sprite_sheets = pack_sprites(sprites, args.algorithm, args.width, args.height)?;
     for (i, sprite_sheet) in sprite_sheets.iter_mut().enumerate() {
         sprite_sheet.change_fps(fps);
         generate_texture_sheets(sprite_sheet, output_dir, i + 1)?;
