@@ -132,6 +132,36 @@ for result in compare_algorithms(&sizes, 4096, 4096)? {
 
 `pack_sprites` does the same for loaded `Sprite` values and returns `SpriteSheet` values ready to be written.
 
+## Development
+
+### Test
+
+```
+cargo test
+```
+
+### Release
+
+Requires `cargo login` and push access to this repository and [homebrew-tap](https://github.com/webcyou-org/homebrew-tap). Start from a clean, up-to-date `main`.
+
+1. Publish the version. `release.sh` updates `Cargo.toml`, `Cargo.lock` and the version in this README, runs the tests and a publish dry run, and asks for confirmation. It then commits, pushes `main`, runs `cargo publish` and pushes the tag.
+
+   ```
+   ./scripts/release.sh 0.3.1
+   ```
+
+2. The tag starts the [Build and Release](.github/workflows/release.yml) workflow, which uploads the Linux, macOS (Intel and Apple Silicon) and Windows binaries to GitHub Releases.
+
+3. Update the Homebrew formula. `update-formula.sh` waits for the macOS binaries, shows the changes to the formula and pushes them after confirmation.
+
+   ```
+   ./scripts/update-formula.sh 0.3.1
+   ```
+
+If a step fails, fix the cause and run the same command again. Steps that are already done are skipped.
+
+A version published to crates.io can never be replaced or deleted, only yanked. Always publish before pushing the tag, which is the order `release.sh` uses.
+
 ## Author
 
 **Daisuke Takayama**
