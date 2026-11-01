@@ -8,6 +8,7 @@ license = "MIT"
 repository = "https://github.com/webcyou-org/open-texture-packer"
 homepage = "https://github.com/webcyou-org/open-texture-packer"
 readme = "README.md"
+exclude = ["assets", "examples/assets"]
 
 [lib]
 name = "open_texture_packer"
