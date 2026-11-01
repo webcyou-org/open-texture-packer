@@ -1,5 +1,7 @@
 //! End-to-end checks: from sprites to the written PNG and JSON files.
 
+#![cfg(feature = "images")]
+
 use image::{DynamicImage, Rgba, RgbaImage};
 use open_texture_packer::{
     calculate_sheet_dimensions, generate_texture_sheets, pack_sprites, JsonSpriteSheet,

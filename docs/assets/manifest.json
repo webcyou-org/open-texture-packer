@@ -1,0 +1,616 @@
+{
+  "sets": [
+    {
+      "id": "sprite",
+      "label": "Sprite",
+      "sprites": [
+        {
+          "name": "sprite1.png",
+          "path": "assets/sprite/sprite1.png",
+          "width": 240,
+          "height": 240
+        },
+        {
+          "name": "sprite2.png",
+          "path": "assets/sprite/sprite2.png",
+          "width": 200,
+          "height": 200
+        },
+        {
+          "name": "sprite3.png",
+          "path": "assets/sprite/sprite3.png",
+          "width": 100,
+          "height": 150
+        }
+      ]
+    },
+    {
+      "id": "dj_fox",
+      "label": "DJ Fox",
+      "sprites": [
+        {
+          "name": "dj_fox_0001.png",
+          "path": "assets/dj_fox/dj_fox_0001.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0002.png",
+          "path": "assets/dj_fox/dj_fox_0002.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0003.png",
+          "path": "assets/dj_fox/dj_fox_0003.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0004.png",
+          "path": "assets/dj_fox/dj_fox_0004.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0005.png",
+          "path": "assets/dj_fox/dj_fox_0005.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0006.png",
+          "path": "assets/dj_fox/dj_fox_0006.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0007.png",
+          "path": "assets/dj_fox/dj_fox_0007.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0008.png",
+          "path": "assets/dj_fox/dj_fox_0008.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0009.png",
+          "path": "assets/dj_fox/dj_fox_0009.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0010.png",
+          "path": "assets/dj_fox/dj_fox_0010.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0011.png",
+          "path": "assets/dj_fox/dj_fox_0011.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0012.png",
+          "path": "assets/dj_fox/dj_fox_0012.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0013.png",
+          "path": "assets/dj_fox/dj_fox_0013.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0014.png",
+          "path": "assets/dj_fox/dj_fox_0014.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0015.png",
+          "path": "assets/dj_fox/dj_fox_0015.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0016.png",
+          "path": "assets/dj_fox/dj_fox_0016.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0017.png",
+          "path": "assets/dj_fox/dj_fox_0017.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0018.png",
+          "path": "assets/dj_fox/dj_fox_0018.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0019.png",
+          "path": "assets/dj_fox/dj_fox_0019.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0020.png",
+          "path": "assets/dj_fox/dj_fox_0020.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0021.png",
+          "path": "assets/dj_fox/dj_fox_0021.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0022.png",
+          "path": "assets/dj_fox/dj_fox_0022.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0023.png",
+          "path": "assets/dj_fox/dj_fox_0023.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0024.png",
+          "path": "assets/dj_fox/dj_fox_0024.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0025.png",
+          "path": "assets/dj_fox/dj_fox_0025.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0026.png",
+          "path": "assets/dj_fox/dj_fox_0026.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0027.png",
+          "path": "assets/dj_fox/dj_fox_0027.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0028.png",
+          "path": "assets/dj_fox/dj_fox_0028.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0029.png",
+          "path": "assets/dj_fox/dj_fox_0029.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0030.png",
+          "path": "assets/dj_fox/dj_fox_0030.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0031.png",
+          "path": "assets/dj_fox/dj_fox_0031.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0032.png",
+          "path": "assets/dj_fox/dj_fox_0032.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0033.png",
+          "path": "assets/dj_fox/dj_fox_0033.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0034.png",
+          "path": "assets/dj_fox/dj_fox_0034.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0035.png",
+          "path": "assets/dj_fox/dj_fox_0035.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0036.png",
+          "path": "assets/dj_fox/dj_fox_0036.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0037.png",
+          "path": "assets/dj_fox/dj_fox_0037.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0038.png",
+          "path": "assets/dj_fox/dj_fox_0038.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0039.png",
+          "path": "assets/dj_fox/dj_fox_0039.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0040.png",
+          "path": "assets/dj_fox/dj_fox_0040.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0041.png",
+          "path": "assets/dj_fox/dj_fox_0041.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0042.png",
+          "path": "assets/dj_fox/dj_fox_0042.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0043.png",
+          "path": "assets/dj_fox/dj_fox_0043.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0044.png",
+          "path": "assets/dj_fox/dj_fox_0044.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0045.png",
+          "path": "assets/dj_fox/dj_fox_0045.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0046.png",
+          "path": "assets/dj_fox/dj_fox_0046.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0047.png",
+          "path": "assets/dj_fox/dj_fox_0047.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "dj_fox_0048.png",
+          "path": "assets/dj_fox/dj_fox_0048.png",
+          "width": 960,
+          "height": 540
+        }
+      ]
+    },
+    {
+      "id": "guitar_rabbit",
+      "label": "Guitar Rabbit",
+      "sprites": [
+        {
+          "name": "guitar_0001.png",
+          "path": "assets/guitar_rabbit/guitar_0001.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0002.png",
+          "path": "assets/guitar_rabbit/guitar_0002.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0003.png",
+          "path": "assets/guitar_rabbit/guitar_0003.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0004.png",
+          "path": "assets/guitar_rabbit/guitar_0004.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0005.png",
+          "path": "assets/guitar_rabbit/guitar_0005.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0006.png",
+          "path": "assets/guitar_rabbit/guitar_0006.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0007.png",
+          "path": "assets/guitar_rabbit/guitar_0007.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0008.png",
+          "path": "assets/guitar_rabbit/guitar_0008.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0009.png",
+          "path": "assets/guitar_rabbit/guitar_0009.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0010.png",
+          "path": "assets/guitar_rabbit/guitar_0010.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0011.png",
+          "path": "assets/guitar_rabbit/guitar_0011.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0012.png",
+          "path": "assets/guitar_rabbit/guitar_0012.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0013.png",
+          "path": "assets/guitar_rabbit/guitar_0013.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0014.png",
+          "path": "assets/guitar_rabbit/guitar_0014.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0015.png",
+          "path": "assets/guitar_rabbit/guitar_0015.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0016.png",
+          "path": "assets/guitar_rabbit/guitar_0016.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0017.png",
+          "path": "assets/guitar_rabbit/guitar_0017.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0018.png",
+          "path": "assets/guitar_rabbit/guitar_0018.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0019.png",
+          "path": "assets/guitar_rabbit/guitar_0019.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0020.png",
+          "path": "assets/guitar_rabbit/guitar_0020.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0021.png",
+          "path": "assets/guitar_rabbit/guitar_0021.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0022.png",
+          "path": "assets/guitar_rabbit/guitar_0022.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0023.png",
+          "path": "assets/guitar_rabbit/guitar_0023.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0024.png",
+          "path": "assets/guitar_rabbit/guitar_0024.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0025.png",
+          "path": "assets/guitar_rabbit/guitar_0025.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0026.png",
+          "path": "assets/guitar_rabbit/guitar_0026.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0027.png",
+          "path": "assets/guitar_rabbit/guitar_0027.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0028.png",
+          "path": "assets/guitar_rabbit/guitar_0028.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0029.png",
+          "path": "assets/guitar_rabbit/guitar_0029.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0030.png",
+          "path": "assets/guitar_rabbit/guitar_0030.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0031.png",
+          "path": "assets/guitar_rabbit/guitar_0031.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0032.png",
+          "path": "assets/guitar_rabbit/guitar_0032.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0033.png",
+          "path": "assets/guitar_rabbit/guitar_0033.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0034.png",
+          "path": "assets/guitar_rabbit/guitar_0034.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0035.png",
+          "path": "assets/guitar_rabbit/guitar_0035.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0036.png",
+          "path": "assets/guitar_rabbit/guitar_0036.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0037.png",
+          "path": "assets/guitar_rabbit/guitar_0037.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0038.png",
+          "path": "assets/guitar_rabbit/guitar_0038.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0039.png",
+          "path": "assets/guitar_rabbit/guitar_0039.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0040.png",
+          "path": "assets/guitar_rabbit/guitar_0040.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0041.png",
+          "path": "assets/guitar_rabbit/guitar_0041.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0042.png",
+          "path": "assets/guitar_rabbit/guitar_0042.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0043.png",
+          "path": "assets/guitar_rabbit/guitar_0043.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0044.png",
+          "path": "assets/guitar_rabbit/guitar_0044.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0045.png",
+          "path": "assets/guitar_rabbit/guitar_0045.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0046.png",
+          "path": "assets/guitar_rabbit/guitar_0046.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0047.png",
+          "path": "assets/guitar_rabbit/guitar_0047.png",
+          "width": 960,
+          "height": 540
+        },
+        {
+          "name": "guitar_0048.png",
+          "path": "assets/guitar_rabbit/guitar_0048.png",
+          "width": 960,
+          "height": 540
+        }
+      ]
+    }
+  ]
+}

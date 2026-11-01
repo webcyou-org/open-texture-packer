@@ -132,13 +132,59 @@ for result in compare_algorithms(&sizes, 4096, 4096)? {
 
 `pack_sprites` does the same for loaded `Sprite` values and returns `SpriteSheet` values ready to be written.
 
+## Web
+
+The packing engine also runs in the browser. [The demo page](https://webcyou-org.github.io/open-texture-packer/) compares every algorithm on the sprites in `examples/assets`.
+
+The WebAssembly build computes layouts only. Decoding and drawing the images is left to the browser.
+
+```js
+import init, { packRects } from "./pkg/open_texture_packer_wasm.js";
+
+await init();
+
+const result = packRects(
+  [{ width: 64, height: 64 }, { width: 32, height: 128 }],
+  "skyline",
+  4096,
+  4096,
+);
+
+for (const sheet of result.sheets) {
+  for (const { index, x, y, width, height } of sheet.placements) {
+    // Draw image `index` at (x, y) on a canvas of sheet.width x sheet.height.
+  }
+}
+```
+
+`packRects` throws if a sprite cannot be placed. `compareAlgorithms(sizes, maxWidth, maxHeight)` returns the results of all algorithms, and `algorithms()` lists their ids and names. Each result also has `usedArea`, `sheetArea` and `occupancy`.
+
+Rust users can leave out the command line tool and image handling, and keep only the engine:
+
+```toml
+open_texture_packer = { version = "0.3", default-features = false }
+```
+
 ## Development
 
 ### Test
 
 ```
 cargo test
+cargo build --no-default-features
+wasm-pack test --node wasm
 ```
+
+### Demo page
+
+The site is served from `docs/`. `build-docs.sh` regenerates `docs/pkg` (the WebAssembly build) and `docs/assets` (a copy of `examples/assets` with a `manifest.json`). Run it after changing the packing engine, the wasm bindings or the sprites, and commit the result. `docs/index.html`, `docs/app.js` and `docs/style.css` are edited by hand.
+
+```
+./scripts/build-docs.sh
+python3 -m http.server -d docs
+```
+
+Then open <http://localhost:8000>. To publish, set Settings > Pages to deploy from the `main` branch and the `/docs` folder. After that, pushing to `main` updates the site.
 
 ### Release
 

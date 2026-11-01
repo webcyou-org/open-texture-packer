@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Open Texture Packer Demo</title>
+  <meta name="description" content="Compare the packing algorithms of Open Texture Packer on real sprite images, running in the browser with WebAssembly.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <header class="page-header">
+    <h1>Open Texture Packer</h1>
+    <p>Compare how each packing algorithm lays out the same sprites. The layouts are computed in your browser by the WebAssembly build of the library.</p>
+    <a href="https://github.com/webcyou-org/open-texture-packer">GitHub repository</a>
+  </header>
+
+  <main>
+    <form class="controls" id="controls">
+      <label>
+        Sprites
+        <select id="set"></select>
+      </label>
+      <label>
+        Sizes
+        <select id="sizes">
+          <option value="mixed">Mixed (scaled 25–100%)</option>
+          <option value="original">Original</option>
+        </select>
+      </label>
+      <label>
+        Max sheet size
+        <select id="max">
+          <option value="1024">1024 × 1024</option>
+          <option value="2048">2048 × 2048</option>
+          <option value="4096">4096 × 4096</option>
+          <option value="8192">8192 × 8192</option>
+        </select>
+      </label>
+      <label class="check">
+        <input type="checkbox" id="outlines" checked>
+        Outlines and frame numbers
+      </label>
+    </form>
+
+    <p class="status" id="status" role="status"></p>
+
+    <div class="table-wrap">
+      <table id="summary" hidden>
+        <thead>
+          <tr>
+            <th scope="col">Algorithm</th>
+            <th scope="col" class="number">Sheets</th>
+            <th scope="col">Sheet sizes</th>
+            <th scope="col" class="number">Sheet area (px)</th>
+            <th scope="col" class="number">Occupancy</th>
+            <th scope="col" class="number">Time</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <section class="cards" id="cards" aria-label="Layouts by algorithm"></section>
+  </main>
+
+  <div class="tooltip" id="tooltip" hidden></div>
+</body>
+</html>

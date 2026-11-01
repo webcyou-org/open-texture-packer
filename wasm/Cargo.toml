@@ -1,0 +1,28 @@
+[package]
+name = "open_texture_packer_wasm"
+version = "0.0.0"
+edition = "2021"
+description = "WebAssembly bindings for the Open Texture Packer packing engine."
+license = "MIT"
+repository = "https://github.com/webcyou-org/open-texture-packer"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+open_texture_packer = { path = "..", default-features = false }
+serde = { version = "^1.0", features = ["derive"] }
+serde-wasm-bindgen = "^0.6"
+wasm-bindgen = "^0.2"
+
+[dev-dependencies]
+js-sys = "^0.3"
+wasm-bindgen-test = "^0.3"
+
+[profile.release]
+lto = true
+opt-level = "s"
+
+# Keeps this crate out of the parent package.
+[workspace]

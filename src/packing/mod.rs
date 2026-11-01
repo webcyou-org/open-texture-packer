@@ -25,7 +25,6 @@ mod maximal_rectangles;
 mod shelf;
 mod skyline;
 
-use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use std::cmp::Reverse;
 use std::error::Error;
@@ -38,7 +37,8 @@ use skyline::SkylineBin;
 /// Number of steps of the sheet width search.
 const WIDTH_SEARCH_STEPS: u32 = 32;
 
-#[derive(Serialize, Deserialize, ValueEnum, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "cli", derive(clap::ValueEnum))]
 #[serde(rename_all = "kebab-case")]
 pub enum PackingAlgorithm {
     ShelfPacking,
