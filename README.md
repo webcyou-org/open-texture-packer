@@ -1,5 +1,7 @@
 # Open Texture Packer
 
+English | [日本語](README.ja.md)
+
 Open source and free Texture Packer tool written in rust.
 
 ![twitter_header_photo_1](https://github.com/user-attachments/assets/75316555-b0e6-4465-b2f2-ac4943b25f39)
@@ -132,6 +134,23 @@ for result in compare_algorithms(&sizes, 4096, 4096)? {
 
 `pack_sprites` does the same for loaded `Sprite` values and returns `SpriteSheet` values ready to be written.
 
+#### Rotation
+
+`pack_rects_with` takes options. With `allow_rotation`, Skyline and Maximal Rectangles may turn a sprite by 90 degrees clockwise when that packs better. The shelf algorithms ignore the option and keep sprites upright (`PackingAlgorithm::supports_rotation`).
+
+```rust
+use open_texture_packer::{pack_rects_with, PackOptions, PackingAlgorithm};
+
+let options = PackOptions { allow_rotation: true };
+let result = pack_rects_with(&sizes, PackingAlgorithm::MaximalRectangles, 4096, 4096, options)?;
+for placement in &result.sheets[0].placements {
+    // width and height are the size on the sheet, swapped when rotated.
+    println!("#{} rotated: {}", placement.index, placement.rotated);
+}
+```
+
+A rotated sprite's top-left corner is at the top-right of its placement. `compare_algorithms_with` compares the algorithms with the same options. `pack_sprites` and the `otp` command do not rotate.
+
 ## Web
 
 The packing engine also runs in the browser. [The demo page](https://webcyou-org.github.io/open-texture-packer/) compares every algorithm on the sprites in `examples/assets`.
@@ -190,7 +209,7 @@ Then open <http://localhost:8000>. To publish, set Settings > Pages to deploy fr
 
 Requires `cargo login` and push access to this repository and [homebrew-tap](https://github.com/webcyou-org/homebrew-tap). Start from a clean, up-to-date `main`.
 
-1. Publish the version. `release.sh` updates `Cargo.toml`, `Cargo.lock` and the version in this README, runs the tests and a publish dry run, and asks for confirmation. It then commits, pushes `main`, runs `cargo publish` and pushes the tag.
+1. Publish the version. `release.sh` updates `Cargo.toml`, `Cargo.lock` and the version in both READMEs, runs the tests and a publish dry run, and asks for confirmation. It then commits, pushes `main`, runs `cargo publish` and pushes the tag.
 
    ```
    ./scripts/release.sh 0.3.1

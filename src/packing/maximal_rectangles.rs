@@ -110,28 +110,32 @@ impl Bin for MaxRectsBin {
         }
     }
 
-    fn insert(&mut self, width: u32, height: u32) -> Option<(u32, u32)> {
-        let mut best: Option<((u32, u32), u32, u32)> = None;
+    fn insert(&mut self, width: u32, height: u32, rotate: bool) -> Option<(u32, u32, bool)> {
+        // On a tie the upright orientation wins, because it is tried first.
+        let mut best: Option<((u32, u32), u32, u32, bool)> = None;
 
-        for free in &self.free {
-            if width > free.width || height > free.height {
-                continue;
-            }
-            let leftover_w = free.width - width;
-            let leftover_h = free.height - height;
-            let score = (leftover_w.min(leftover_h), leftover_w.max(leftover_h));
-            if best.is_none_or(|(best_score, _, _)| score < best_score) {
-                best = Some((score, free.x, free.y));
+        for (w, h, rotated) in super::orientations(width, height, rotate) {
+            for free in &self.free {
+                if w > free.width || h > free.height {
+                    continue;
+                }
+                let leftover_w = free.width - w;
+                let leftover_h = free.height - h;
+                let score = (leftover_w.min(leftover_h), leftover_w.max(leftover_h));
+                if best.is_none_or(|(best_score, ..)| score < best_score) {
+                    best = Some((score, free.x, free.y, rotated));
+                }
             }
         }
 
-        let (_, x, y) = best?;
+        let (_, x, y, rotated) = best?;
+        let (width, height) = if rotated { (height, width) } else { (width, height) };
         self.reserve(&Rect {
             x,
             y,
             width,
             height,
         });
-        Some((x, y))
+        Some((x, y, rotated))
     }
 }

@@ -169,7 +169,7 @@ pub(super) fn pack(
         };
 
         let (x, y) = sheets[sheet].place_on_shelf(shelf, width, height);
-        placed[sheet].push((index, x, y));
+        placed[sheet].push((index, x, y, false));
     }
 
     placed

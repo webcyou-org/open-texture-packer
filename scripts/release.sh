@@ -11,6 +11,8 @@
 set -euo pipefail
 
 CRATE="open_texture_packer"
+READMES=(README.md README.ja.md)
+VERSION_FILES=(Cargo.toml Cargo.lock "${READMES[@]}")
 
 die() {
     echo "error: $*" >&2
@@ -45,8 +47,8 @@ push_tag() {
 bump_pending=0
 restore_version_files() {
     if [ "$bump_pending" = 1 ]; then
-        git checkout -- Cargo.toml Cargo.lock README.md
-        echo "Restored Cargo.toml, Cargo.lock and README.md." >&2
+        git checkout -- "${VERSION_FILES[@]}"
+        echo "Restored ${VERSION_FILES[*]}." >&2
     fi
 }
 trap restore_version_files EXIT
@@ -114,8 +116,11 @@ if [ "$current" != "$VERSION" ]; then
     bump_pending=1
     bumped=1
     sed -i.bak "s/^version = \"$current\"\$/version = \"$VERSION\"/" Cargo.toml
-    sed -i.bak "s/^$CRATE = \".*\"\$/$CRATE = \"$VERSION\"/" README.md
-    rm -f Cargo.toml.bak README.md.bak
+    rm -f Cargo.toml.bak
+    for readme in "${READMES[@]}"; do
+        sed -i.bak "s/^$CRATE = \".*\"\$/$CRATE = \"$VERSION\"/" "$readme"
+        rm -f "$readme.bak"
+    done
 fi
 
 # --- Verification ---------------------------------------------------------
@@ -127,11 +132,13 @@ if [ "$bumped" = 1 ]; then
     cargo publish --dry-run --allow-dirty
 
     grep -q "^version = \"$VERSION\"\$" Cargo.toml || die "Cargo.toml was not updated"
-    grep -q "^$CRATE = \"$VERSION\"\$" README.md || die "README.md was not updated"
+    for readme in "${READMES[@]}"; do
+        grep -q "^$CRATE = \"$VERSION\"\$" "$readme" || die "$readme was not updated"
+    done
     grep -A 1 "^name = \"$CRATE\"\$" Cargo.lock | grep -q "^version = \"$VERSION\"\$" \
         || die "Cargo.lock was not updated"
 
-    git --no-pager diff -- Cargo.toml Cargo.lock README.md
+    git --no-pager diff -- "${VERSION_FILES[@]}"
 else
     cargo publish --dry-run
 fi
@@ -144,7 +151,7 @@ echo "A version published to crates.io can never be replaced or deleted."
 confirm "Continue?"
 
 if [ "$bumped" = 1 ]; then
-    git add Cargo.toml Cargo.lock README.md
+    git add "${VERSION_FILES[@]}"
     git commit -m "feat: 🎸 $TAG"
     bump_pending=0
 fi

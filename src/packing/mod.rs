@@ -14,6 +14,10 @@
 //! | [`PackingAlgorithm::Skyline`]           | height     | lowest top edge on the skyline                   |
 //! | [`PackingAlgorithm::MaximalRectangles`] | area       | free rectangle with the smallest short-side gap  |
 //!
+//! [`PackingAlgorithm::Skyline`] and [`PackingAlgorithm::MaximalRectangles`]
+//! can also turn sprites by 90 degrees when [`PackOptions::allow_rotation`] is
+//! set. The shelf algorithms keep every sprite upright.
+//!
 //! `NextFit` is the streaming algorithm: a single pass at the full sheet
 //! width. All the others also try narrower sheet widths and keep the layout
 //! with the fewest sheets and the smallest area, then refit the partly filled
@@ -72,6 +76,24 @@ impl PackingAlgorithm {
             PackingAlgorithm::MaximalRectangles => "Maximal Rectangles",
         }
     }
+
+    /// Whether the algorithm uses [`PackOptions::allow_rotation`].
+    pub fn supports_rotation(&self) -> bool {
+        matches!(
+            self,
+            PackingAlgorithm::Skyline | PackingAlgorithm::MaximalRectangles
+        )
+    }
+}
+
+/// Settings that apply to every algorithm.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Default, Hash)]
+#[serde(default)]
+pub struct PackOptions {
+    /// Lets sprites turn by 90 degrees clockwise when that packs them better.
+    /// Ignored by algorithms whose [`PackingAlgorithm::supports_rotation`] is
+    /// false.
+    pub allow_rotation: bool,
 }
 
 impl fmt::Display for PackingAlgorithm {
@@ -87,8 +109,14 @@ pub struct Placement {
     pub index: usize,
     pub x: u32,
     pub y: u32,
+    /// Size on the sheet. For a rotated sprite this is the input size with
+    /// width and height swapped.
     pub width: u32,
     pub height: u32,
+    /// The sprite is turned 90 degrees clockwise: its top-left corner is at
+    /// the top-right of the placement.
+    #[serde(default)]
+    pub rotated: bool,
 }
 
 /// One output sheet, cropped to its content.
@@ -171,24 +199,55 @@ impl fmt::Display for PackingError {
 impl Error for PackingError {}
 
 /// Packs `(width, height)` sizes into as many sheets of at most
-/// `max_width` x `max_height` as needed.
+/// `max_width` x `max_height` as needed. Sprites stay upright.
 pub fn pack_rects(
     sizes: &[(u32, u32)],
     algorithm: PackingAlgorithm,
     max_width: u32,
     max_height: u32,
 ) -> Result<PackingResult, PackingError> {
-    validate(sizes, max_width, max_height)?;
+    pack_rects_with(sizes, algorithm, max_width, max_height, PackOptions::default())
+}
+
+/// [`pack_rects`] with options.
+pub fn pack_rects_with(
+    sizes: &[(u32, u32)],
+    algorithm: PackingAlgorithm,
+    max_width: u32,
+    max_height: u32,
+    options: PackOptions,
+) -> Result<PackingResult, PackingError> {
+    let rotate = options.allow_rotation && algorithm.supports_rotation();
+    let bounds = Bounds {
+        max_width,
+        max_height,
+        rotate,
+    };
+    validate(sizes, bounds)?;
 
     let sheets = if algorithm == PackingAlgorithm::NextFit {
-        single_pass(sizes, algorithm, max_width, max_height)
+        single_pass(sizes, algorithm, max_width, max_height, rotate)
     } else {
-        let mut sheets = search_layout(sizes, algorithm, max_width, max_height);
-        shrink_last_sheet(&mut sheets, algorithm, max_width, max_height);
+        let mut sheets = search_layout(sizes, algorithm, bounds);
+        shrink_last_sheet(&mut sheets, algorithm, bounds);
         sheets
     };
 
     Ok(PackingResult { algorithm, sheets })
+}
+
+/// The sheet limits and whether sprites may turn.
+#[derive(Debug, Clone, Copy)]
+struct Bounds {
+    max_width: u32,
+    max_height: u32,
+    rotate: bool,
+}
+
+/// The orientations to try for a sprite: upright first, then turned.
+fn orientations(width: u32, height: u32, rotate: bool) -> impl Iterator<Item = (u32, u32, bool)> {
+    let turned = (rotate && width != height).then_some((height, width, true));
+    std::iter::once((width, height, false)).chain(turned)
 }
 
 /// Runs every algorithm on the same input, in the order of
@@ -198,9 +257,19 @@ pub fn compare_algorithms(
     max_width: u32,
     max_height: u32,
 ) -> Result<Vec<PackingResult>, PackingError> {
+    compare_algorithms_with(sizes, max_width, max_height, PackOptions::default())
+}
+
+/// [`compare_algorithms`] with options.
+pub fn compare_algorithms_with(
+    sizes: &[(u32, u32)],
+    max_width: u32,
+    max_height: u32,
+    options: PackOptions,
+) -> Result<Vec<PackingResult>, PackingError> {
     PackingAlgorithm::ALL
         .iter()
-        .map(|&algorithm| pack_rects(sizes, algorithm, max_width, max_height))
+        .map(|&algorithm| pack_rects_with(sizes, algorithm, max_width, max_height, options))
         .collect()
 }
 
@@ -208,32 +277,27 @@ pub fn compare_algorithms(
 fn search_layout(
     sizes: &[(u32, u32)],
     algorithm: PackingAlgorithm,
-    max_width: u32,
-    max_height: u32,
+    bounds: Bounds,
 ) -> Vec<PackedSheet> {
-    candidate_widths(sizes, max_width)
+    candidate_widths(sizes, bounds)
         .into_iter()
-        .map(|width| single_pass(sizes, algorithm, width, max_height))
+        .map(|width| single_pass(sizes, algorithm, width, bounds.max_height, bounds.rotate))
         .min_by_key(|sheets| layout_rank(sheets))
         .unwrap_or_default()
 }
 
 /// The search shares one bin size between all sheets, and earlier sheets need
 /// it to be large. The partly filled last sheet can usually be much smaller.
-fn shrink_last_sheet(
-    sheets: &mut [PackedSheet],
-    algorithm: PackingAlgorithm,
-    max_width: u32,
-    max_height: u32,
-) {
+fn shrink_last_sheet(sheets: &mut [PackedSheet], algorithm: PackingAlgorithm, bounds: Bounds) {
     let [_, .., last] = sheets else { return };
 
+    // The input sizes, so that the refit can choose the orientation again.
     let sizes: Vec<(u32, u32)> = last
         .placements
         .iter()
-        .map(|p| (p.width, p.height))
+        .map(|p| if p.rotated { (p.height, p.width) } else { (p.width, p.height) })
         .collect();
-    let refit = search_layout(&sizes, algorithm, max_width, max_height);
+    let refit = search_layout(&sizes, algorithm, bounds);
     let [refit] = refit.as_slice() else { return };
 
     if refit.width as u64 * refit.height as u64 >= last.width as u64 * last.height as u64 {
@@ -256,18 +320,27 @@ fn shrink_last_sheet(
     };
 }
 
-fn validate(sizes: &[(u32, u32)], max_width: u32, max_height: u32) -> Result<(), PackingError> {
+/// The narrowest width the sprite can take on a sheet of `bounds`, or `None`
+/// if it fits in no orientation.
+fn narrowest_width(width: u32, height: u32, bounds: Bounds) -> Option<u32> {
+    orientations(width, height, bounds.rotate)
+        .filter(|&(w, h, _)| w <= bounds.max_width && h <= bounds.max_height)
+        .map(|(w, _, _)| w)
+        .min()
+}
+
+fn validate(sizes: &[(u32, u32)], bounds: Bounds) -> Result<(), PackingError> {
     for (index, &(width, height)) in sizes.iter().enumerate() {
         if width == 0 || height == 0 {
             return Err(PackingError::EmptySprite { index });
         }
-        if width > max_width || height > max_height {
+        if narrowest_width(width, height, bounds).is_none() {
             return Err(PackingError::SpriteTooLarge {
                 index,
                 width,
                 height,
-                max_width,
-                max_height,
+                max_width: bounds.max_width,
+                max_height: bounds.max_height,
             });
         }
     }
@@ -276,10 +349,19 @@ fn validate(sizes: &[(u32, u32)], max_width: u32, max_height: u32) -> Result<(),
 
 /// Sheet widths to try, spaced geometrically from the widest sprite up to the
 /// width of a single row of all sprites (anything wider changes nothing).
-fn candidate_widths(sizes: &[(u32, u32)], max_width: u32) -> Vec<u32> {
-    let lower = sizes.iter().map(|&(w, _)| w).max().unwrap_or(0);
-    let row: u64 = sizes.iter().map(|&(w, _)| w as u64).sum();
-    let upper = row.min(max_width as u64) as u32;
+/// With rotation, each sprite counts with its narrowest fitting width for the
+/// lower end and its widest side for the row.
+fn candidate_widths(sizes: &[(u32, u32)], bounds: Bounds) -> Vec<u32> {
+    let lower = sizes
+        .iter()
+        .filter_map(|&(w, h)| narrowest_width(w, h, bounds))
+        .max()
+        .unwrap_or(0);
+    let row: u64 = sizes
+        .iter()
+        .map(|&(w, h)| if bounds.rotate { w.max(h) } else { w } as u64)
+        .sum();
+    let upper = row.min(bounds.max_width as u64).max(lower as u64) as u32;
     if lower == 0 {
         return Vec::new();
     }
@@ -316,6 +398,7 @@ fn single_pass(
     algorithm: PackingAlgorithm,
     bin_width: u32,
     bin_height: u32,
+    rotate: bool,
 ) -> Vec<PackedSheet> {
     use PackingAlgorithm::*;
 
@@ -337,8 +420,10 @@ fn single_pass(
             shelf::pack(&order, sizes, ShelfRule::First, bin_width, bin_height)
         }
         BestFit => shelf::pack(&order, sizes, ShelfRule::Best, bin_width, bin_height),
-        Skyline => pack_first_bin::<SkylineBin>(&order, sizes, bin_width, bin_height),
-        MaximalRectangles => pack_first_bin::<MaxRectsBin>(&order, sizes, bin_width, bin_height),
+        Skyline => pack_first_bin::<SkylineBin>(&order, sizes, bin_width, bin_height, rotate),
+        MaximalRectangles => {
+            pack_first_bin::<MaxRectsBin>(&order, sizes, bin_width, bin_height, rotate)
+        }
     };
 
     raw.into_iter()
@@ -353,13 +438,15 @@ fn sorted_order<K: Ord>(sizes: &[(u32, u32)], key: impl Fn(u32, u32) -> K) -> Ve
     order
 }
 
-/// `(input index, x, y)` of the rectangles on one sheet.
-type RawSheet = Vec<(usize, u32, u32)>;
+/// `(input index, x, y, rotated)` of the rectangles on one sheet.
+type RawSheet = Vec<(usize, u32, u32, bool)>;
 
 /// A single sheet being filled by a free-space algorithm.
 trait Bin {
     fn new(width: u32, height: u32) -> Self;
-    fn insert(&mut self, width: u32, height: u32) -> Option<(u32, u32)>;
+    /// Returns the position and whether the rectangle was turned. It is only
+    /// turned when `rotate` is set.
+    fn insert(&mut self, width: u32, height: u32, rotate: bool) -> Option<(u32, u32, bool)>;
 }
 
 /// Puts each rectangle on the earliest sheet that has room for it.
@@ -368,6 +455,7 @@ fn pack_first_bin<B: Bin>(
     sizes: &[(u32, u32)],
     bin_width: u32,
     bin_height: u32,
+    rotate: bool,
 ) -> Vec<RawSheet> {
     let mut bins: Vec<B> = Vec::new();
     let mut sheets: Vec<RawSheet> = Vec::new();
@@ -375,34 +463,39 @@ fn pack_first_bin<B: Bin>(
     'rects: for &index in order {
         let (width, height) = sizes[index];
         for (bin, sheet) in bins.iter_mut().zip(sheets.iter_mut()) {
-            if let Some((x, y)) = bin.insert(width, height) {
-                sheet.push((index, x, y));
+            if let Some((x, y, rotated)) = bin.insert(width, height, rotate) {
+                sheet.push((index, x, y, rotated));
                 continue 'rects;
             }
         }
 
         let mut bin = B::new(bin_width, bin_height);
-        let (x, y) = bin
-            .insert(width, height)
+        let (x, y, rotated) = bin
+            .insert(width, height, rotate)
             .expect("validated rectangles fit in an empty bin");
         bins.push(bin);
-        sheets.push(vec![(index, x, y)]);
+        sheets.push(vec![(index, x, y, rotated)]);
     }
 
     sheets
 }
 
 fn finish_sheet(mut placed: RawSheet, sizes: &[(u32, u32)]) -> PackedSheet {
-    placed.sort_unstable_by_key(|&(index, _, _)| index);
+    placed.sort_unstable_by_key(|&(index, ..)| index);
 
     let placements: Vec<Placement> = placed
         .into_iter()
-        .map(|(index, x, y)| Placement {
-            index,
-            x,
-            y,
-            width: sizes[index].0,
-            height: sizes[index].1,
+        .map(|(index, x, y, rotated)| {
+            let (width, height) = sizes[index];
+            let (width, height) = if rotated { (height, width) } else { (width, height) };
+            Placement {
+                index,
+                x,
+                y,
+                width,
+                height,
+                rotated,
+            }
         })
         .collect();
 
@@ -449,7 +542,7 @@ mod tests {
         algorithm: PackingAlgorithm,
         sizes: &[(u32, u32)],
     ) -> Vec<(u32, u32)> {
-        let sheets = single_pass(sizes, algorithm, 10, 10);
+        let sheets = single_pass(sizes, algorithm, 10, 10, false);
         assert_eq!(sheets.len(), 1);
         positions(&sheets[0])
     }
@@ -470,7 +563,9 @@ mod tests {
             }
 
             for (i, a) in sheet.placements.iter().enumerate() {
-                assert_eq!((a.width, a.height), sizes[a.index], "{name}: size changed");
+                let (w, h) = sizes[a.index];
+                let expected = if a.rotated { (h, w) } else { (w, h) };
+                assert_eq!((a.width, a.height), expected, "{name}: size changed");
                 assert!(!seen[a.index], "{name}: #{} placed twice", a.index);
                 seen[a.index] = true;
                 assert!(
@@ -559,16 +654,16 @@ mod tests {
         let mut skyline = SkylineBin::new(10, 10);
         let mut max_rects = MaxRectsBin::new(10, 10);
         for (w, h) in [(4, 2), (10, 2)] {
-            assert_eq!(skyline.insert(w, h), max_rects.insert(w, h));
+            assert_eq!(skyline.insert(w, h, false), max_rects.insert(w, h, false));
         }
-        assert_eq!(skyline.insert(6, 2), Some((0, 4)));
-        assert_eq!(max_rects.insert(6, 2), Some((4, 0)));
+        assert_eq!(skyline.insert(6, 2, false), Some((0, 4, false)));
+        assert_eq!(max_rects.insert(6, 2, false), Some((4, 0, false)));
     }
 
     #[test]
     fn maximal_rectangles_tiles_a_perfect_fit() {
         let sizes = [(6, 6), (4, 10), (6, 4)];
-        let sheets = single_pass(&sizes, MaximalRectangles, 10, 10);
+        let sheets = single_pass(&sizes, MaximalRectangles, 10, 10, false);
         assert_eq!(positions(&sheets[0]), [(4, 0), (0, 0), (4, 6)]);
         assert_eq!((sheets[0].width, sheets[0].height), (10, 10));
     }
@@ -576,16 +671,16 @@ mod tests {
     #[test]
     fn free_space_bins_refuse_what_does_not_fit() {
         let mut skyline = SkylineBin::new(4, 4);
-        assert_eq!(skyline.insert(5, 1), None);
-        assert_eq!(skyline.insert(1, 5), None);
-        assert_eq!(skyline.insert(4, 4), Some((0, 0)));
-        assert_eq!(skyline.insert(1, 1), None);
+        assert_eq!(skyline.insert(5, 1, false), None);
+        assert_eq!(skyline.insert(1, 5, false), None);
+        assert_eq!(skyline.insert(4, 4, false), Some((0, 0, false)));
+        assert_eq!(skyline.insert(1, 1, false), None);
 
         let mut max_rects = MaxRectsBin::new(4, 4);
-        assert_eq!(max_rects.insert(5, 1), None);
-        assert_eq!(max_rects.insert(1, 5), None);
-        assert_eq!(max_rects.insert(4, 4), Some((0, 0)));
-        assert_eq!(max_rects.insert(1, 1), None);
+        assert_eq!(max_rects.insert(5, 1, false), None);
+        assert_eq!(max_rects.insert(1, 5, false), None);
+        assert_eq!(max_rects.insert(4, 4, false), Some((0, 0, false)));
+        assert_eq!(max_rects.insert(1, 1, false), None);
     }
 
     #[test]
@@ -663,7 +758,7 @@ mod tests {
             let sizes = random_sizes(seed, 200, 8, 96);
             for algorithm in PackingAlgorithm::ALL {
                 let result = pack_rects(&sizes, algorithm, 512, 512).unwrap();
-                let full_width = single_pass(&sizes, algorithm, 512, 512);
+                let full_width = single_pass(&sizes, algorithm, 512, 512, false);
                 assert!(result.sheets.len() <= full_width.len(), "{algorithm}");
             }
         }
@@ -711,6 +806,87 @@ mod tests {
             assert!(result.sheets.is_empty());
             assert_eq!(result.occupancy(), 0.0);
         }
+    }
+
+    fn rotation() -> PackOptions {
+        PackOptions {
+            allow_rotation: true,
+        }
+    }
+
+    #[test]
+    fn rotation_is_off_by_default_and_changes_nothing_when_off() {
+        let sizes = random_sizes(4, 120, 1, 96);
+        for algorithm in PackingAlgorithm::ALL {
+            let plain = pack_rects(&sizes, algorithm, 512, 512).unwrap();
+            let with = pack_rects_with(&sizes, algorithm, 512, 512, PackOptions::default()).unwrap();
+            assert_eq!(plain, with, "{algorithm}");
+            assert!(plain.sheets.iter().flat_map(|s| &s.placements).all(|p| !p.rotated));
+        }
+    }
+
+    #[test]
+    fn rotated_layouts_are_valid() {
+        for seed in 1..=5u64 {
+            for (count, min, max, sheet_w, sheet_h) in
+                [(150, 1, 96, 512, 512), (80, 4, 40, 128, 64), (60, 1, 30, 30, 200)]
+            {
+                let sizes: Vec<_> = random_sizes(seed, count, min, max)
+                    .into_iter()
+                    .map(|(w, h)| (w.min(sheet_w.min(sheet_h)), h.min(sheet_w.min(sheet_h))))
+                    .collect();
+                for result in compare_algorithms_with(&sizes, sheet_w, sheet_h, rotation()).unwrap() {
+                    assert_valid(&result, &sizes, sheet_w, sheet_h);
+                    if !result.algorithm.supports_rotation() {
+                        assert!(result.sheets.iter().flat_map(|s| &s.placements).all(|p| !p.rotated));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn rotation_fits_sprites_that_only_fit_turned() {
+        // 10x40 only fits a 40x10 sheet lying down.
+        let sizes = [(10, 40), (40, 10)];
+        for algorithm in [Skyline, MaximalRectangles] {
+            assert!(pack_rects(&sizes, algorithm, 40, 10).is_err());
+            let result = pack_rects_with(&sizes, algorithm, 40, 10, rotation()).unwrap();
+            assert_valid(&result, &sizes, 40, 10);
+            let first = result.sheets.iter().flat_map(|s| &s.placements).find(|p| p.index == 0).unwrap();
+            assert!(first.rotated);
+            assert_eq!((first.width, first.height), (40, 10));
+        }
+        // Shelf algorithms keep sprites upright and report the sprite instead.
+        assert!(pack_rects_with(&sizes, FirstFit, 40, 10, rotation()).is_err());
+    }
+
+    #[test]
+    fn rotation_packs_tall_sprites_into_fewer_sheets() {
+        // Tall sprites on a wide sheet: lying down, two fit per sheet.
+        let sizes = vec![(20, 60); 4];
+        for algorithm in [Skyline, MaximalRectangles] {
+            let upright = pack_rects(&sizes, algorithm, 60, 40).unwrap_err();
+            assert!(matches!(upright, PackingError::SpriteTooLarge { .. }));
+            let turned = pack_rects_with(&sizes, algorithm, 60, 40, rotation()).unwrap();
+            assert_eq!(turned.sheets.len(), 2, "{algorithm}");
+        }
+        let sizes = vec![(30, 100); 6];
+        for algorithm in [Skyline, MaximalRectangles] {
+            let upright = pack_rects(&sizes, algorithm, 200, 100).unwrap();
+            let turned = pack_rects_with(&sizes, algorithm, 200, 100, rotation()).unwrap();
+            assert!(turned.sheets.len() <= upright.sheets.len(), "{algorithm}");
+            assert_valid(&turned, &sizes, 200, 100);
+        }
+    }
+
+    #[test]
+    fn rotation_is_deterministic() {
+        let sizes = random_sizes(11, 150, 1, 96);
+        assert_eq!(
+            compare_algorithms_with(&sizes, 512, 512, rotation()).unwrap(),
+            compare_algorithms_with(&sizes, 512, 512, rotation()).unwrap()
+        );
     }
 
     #[test]

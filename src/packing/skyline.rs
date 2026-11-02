@@ -85,22 +85,26 @@ impl Bin for SkylineBin {
         }
     }
 
-    fn insert(&mut self, width: u32, height: u32) -> Option<(u32, u32)> {
-        // (top edge, width of the segment it starts on), lowest first.
-        let mut best: Option<((u32, u32), usize, u32)> = None;
+    fn insert(&mut self, width: u32, height: u32, rotate: bool) -> Option<(u32, u32, bool)> {
+        // (top edge, width of the segment it starts on), lowest first. On a
+        // tie the upright orientation wins, because it is tried first.
+        let mut best: Option<((u32, u32), usize, u32, bool)> = None;
 
-        for start in 0..self.segments.len() {
-            if let Some(y) = self.resting_y(start, width, height) {
-                let score = (y + height, self.segments[start].width);
-                if best.is_none_or(|(best_score, _, _)| score < best_score) {
-                    best = Some((score, start, y));
+        for (w, h, rotated) in super::orientations(width, height, rotate) {
+            for start in 0..self.segments.len() {
+                if let Some(y) = self.resting_y(start, w, h) {
+                    let score = (y + h, self.segments[start].width);
+                    if best.is_none_or(|(best_score, ..)| score < best_score) {
+                        best = Some((score, start, y, rotated));
+                    }
                 }
             }
         }
 
-        let (_, start, y) = best?;
+        let (_, start, y, rotated) = best?;
+        let (w, h) = if rotated { (height, width) } else { (width, height) };
         let x = self.segments[start].x;
-        self.raise(start, width, y + height);
-        Some((x, y))
+        self.raise(start, w, y + h);
+        Some((x, y, rotated))
     }
 }
