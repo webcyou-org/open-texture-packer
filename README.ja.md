@@ -35,7 +35,7 @@ cargo add open_texture_packer
 
 ```
 [dependencies]
-open_texture_packer = "0.3.1"
+open_texture_packer = "0.4.0"
 ```
 
 ## 基本的な使い方
